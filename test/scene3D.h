@@ -32,6 +32,8 @@ class Scene3D : public QGLWidget
       void drawFigure();
       void setHeightMap();
       void drawCube(float x,float y,float h);
+      void move_quad();
+      void drawObjects();
    protected:
       void initializeGL();
       void resizeGL(int nWidth, int nHeight);

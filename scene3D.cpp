@@ -2,26 +2,12 @@
 #include <QtGui>
 #include <math.h>
 #include "scene3D.h"
-#include <vector>
-#include "glm/glm/glm.hpp"
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <GL/gl.h>
-#include "object3d.h"
-#include <vector>
-
-
-
-using namespace std;
 
 const static float pi=3.141593, k=pi/180;
 
 GLfloat VertexArray[12][3];
 GLfloat ColorArray[12][3];
 GLubyte IndexArray[20][3];
-
-vector<object3D*> main_list;
 
 Scene3D::Scene3D(QWidget* parent) : QGLWidget(parent)
 {
@@ -30,23 +16,14 @@ Scene3D::Scene3D(QWidget* parent) : QGLWidget(parent)
 
 void Scene3D::initializeGL()
 {
-    GLfloat light_col[] = {1,1,1};
    qglClearColor(Qt::white);
    glEnable(GL_DEPTH_TEST);
    glShadeModel(GL_FLAT);
    glEnable(GL_CULL_FACE);
 
-
-
-   glLightfv(GL_LIGHT0, GL_DIFFUSE, light_col);
-   glEnable(GL_LIGHTING);
-   glEnable(GL_LIGHT0);
-
-glEnable(GL_COLOR_MATERIAL);
-   //glEnable(GL_LIGHTING);
-
-
-
+   getVertexArray();
+   getColorArray();
+   getIndexArray();
 
    glEnableClientState(GL_VERTEX_ARRAY);
    glEnableClientState(GL_COLOR_ARRAY);
@@ -82,17 +59,6 @@ void Scene3D::paintGL()
 
    drawAxis();
    drawFigure();
-
-   drawObjects();
-   //drawRect();
-}
-
-void Scene3D::drawObjects()
-{
-    vector<object3D*>::iterator it;
-
-    for(it=main_list.begin();it!=main_list.end();it++)
-        (*it)->draw();
 }
 
 void Scene3D::mousePressEvent(QMouseEvent* pe)
@@ -169,10 +135,6 @@ void Scene3D::keyPressEvent(QKeyEvent* pe)
       case Qt::Key_Escape:
          this->close();
       break;
-
-      case Qt::Key_Alt:
-       this->move_quad();
-       break;
    }
 
    updateGL();
@@ -245,6 +207,61 @@ void Scene3D::drawAxis()
    glEnd();
 }
 
+void Scene3D::getVertexArray()
+{
+   GLfloat R=0.75;
+
+   GLfloat a=4*R/sqrt(10+2*sqrt(5));
+   GLfloat alpha=acos((1-a*a/2/R/R));
+
+   VertexArray[0][0]=0;
+   VertexArray[0][1]=0;
+   VertexArray[0][2]=R;
+
+   VertexArray[1][0]=R*sin(alpha)*sin(0);
+   VertexArray[1][1]=R*sin(alpha)*cos(0);
+   VertexArray[1][2]=R*cos(alpha);
+
+   VertexArray[2][0]=R*sin(alpha)*sin(72*k);
+   VertexArray[2][1]=R*sin(alpha)*cos(72*k);
+   VertexArray[2][2]=R*cos(alpha);
+
+   VertexArray[3][0]=R*sin(alpha)*sin(2*72*k);
+   VertexArray[3][1]=R*sin(alpha)*cos(2*72*k);
+   VertexArray[3][2]=R*cos(alpha);
+
+   VertexArray[4][0]=R*sin(alpha)*sin(3*72*k);
+   VertexArray[4][1]=R*sin(alpha)*cos(3*72*k);
+   VertexArray[4][2]=R*cos(alpha);
+
+   VertexArray[5][0]=R*sin(alpha)*sin(4*72*k);
+   VertexArray[5][1]=R*sin(alpha)*cos(4*72*k);
+   VertexArray[5][2]=R*cos(alpha);
+
+   VertexArray[6][0]=R*sin(pi-alpha)*sin(-36*k);
+   VertexArray[6][1]=R*sin(pi-alpha)*cos(-36*k);
+   VertexArray[6][2]=R*cos(pi-alpha);
+
+   VertexArray[7][0]=R*sin(pi-alpha)*sin(36*k);
+   VertexArray[7][1]=R*sin(pi-alpha)*cos(36*k);
+   VertexArray[7][2]=R*cos(pi-alpha);
+
+   VertexArray[8][0]=R*sin(pi-alpha)*sin((36+72)*k);
+   VertexArray[8][1]=R*sin(pi-alpha)*cos((36+72)*k);
+   VertexArray[8][2]=R*cos(pi-alpha);
+
+   VertexArray[9][0]=R*sin(pi-alpha)*sin((36+2*72)*k);
+   VertexArray[9][1]=R*sin(pi-alpha)*cos((36+2*72)*k);
+   VertexArray[9][2]=R*cos(pi-alpha);
+
+   VertexArray[10][0]=R*sin(pi-alpha)*sin((36+3*72)*k);
+   VertexArray[10][1]=R*sin(pi-alpha)*cos((36+3*72)*k);
+   VertexArray[10][2]=R*cos(pi-alpha);
+
+   VertexArray[11][0]=0;
+   VertexArray[11][1]=0;
+   VertexArray[11][2]=-R;
+}
 
 void Scene3D::getColorArray()
 {
@@ -256,95 +273,92 @@ void Scene3D::getColorArray()
    }
 }
 
+void Scene3D::getIndexArray()
+{
+   IndexArray[0][0]=0;
+   IndexArray[0][1]=2;
+   IndexArray[0][2]=1;
 
+   IndexArray[1][0]=0;
+   IndexArray[1][1]=3;
+   IndexArray[1][2]=2;
 
+   IndexArray[2][0]=0;
+   IndexArray[2][1]=4;
+   IndexArray[2][2]=3;
 
+   IndexArray[3][0]=0;
+   IndexArray[3][1]=5;
+   IndexArray[3][2]=4;
+
+   IndexArray[4][0]=0;
+   IndexArray[4][1]=1;
+   IndexArray[4][2]=5;
+
+   IndexArray[5][0]=6;
+   IndexArray[5][1]=1;
+   IndexArray[5][2]=7;
+
+   IndexArray[6][0]=7;
+   IndexArray[6][1]=1;
+   IndexArray[6][2]=2;
+
+   IndexArray[7][0]=7;
+   IndexArray[7][1]=2;
+   IndexArray[7][2]=8;
+
+   IndexArray[8][0]=8;
+   IndexArray[8][1]=2;
+   IndexArray[8][2]=3;
+
+   IndexArray[9][0]=8;
+   IndexArray[9][1]=3;
+   IndexArray[9][2]=9;
+
+   IndexArray[10][0]=9;
+   IndexArray[10][1]=3;
+   IndexArray[10][2]=4;
+
+   IndexArray[11][0]=9;
+   IndexArray[11][1]=4;
+   IndexArray[11][2]=10;
+
+   IndexArray[12][0]=10;
+   IndexArray[12][1]=4;
+   IndexArray[12][2]=5;
+
+   IndexArray[13][0]=10;
+   IndexArray[13][1]=5;
+   IndexArray[13][2]=6;
+
+   IndexArray[14][0]=6;
+   IndexArray[14][1]=5;
+   IndexArray[14][2]=1;
+
+   IndexArray[15][0]=7;
+   IndexArray[15][1]=11;
+   IndexArray[15][2]=6;
+
+   IndexArray[16][0]=8;
+   IndexArray[16][1]=11;
+   IndexArray[16][2]=7;
+
+   IndexArray[17][0]=9;
+   IndexArray[17][1]=11;
+   IndexArray[17][2]=8;
+
+   IndexArray[18][0]=10;
+   IndexArray[18][1]=11;
+   IndexArray[18][2]=9;
+
+   IndexArray[19][0]=6;
+   IndexArray[19][1]=11;
+   IndexArray[19][2]=10;
+}
 
 void Scene3D::drawFigure()
 {
-    float R=1;
-
-    glBegin(GL_QUADS);  // draw a cube with 12 triangles
-
-    glColor3f(0.5*R, 0.5*R, 0.0*R);
-
-    glVertex3f(-1.0*R, 1.0*R, 0.0*R);
-    glVertex3f(-1.0*R, -1.0*R, 0.0*R);
-
-
-    glVertex3f(1.0*R, -1.0*R, 0.0*R);
-    glVertex3f(1.0*R, 1.0*R, 0.0*R);
-
-
-
-
-
-
-
-
-
-    glEnd();
-
-    drawCube(0.0,0.0,0.3);
-
-
-
+   glVertexPointer(3, GL_FLOAT, 0, VertexArray);
+   glColorPointer(3, GL_FLOAT, 0, ColorArray);
+   glDrawElements(GL_TRIANGLES, 60, GL_UNSIGNED_BYTE, IndexArray);
 }
-
-
-void Scene3D::move_quad(){
-    //glPushMatrix();
-    //glRotatef(0.5,0.0,0.0,0.0);
-
-    main_list.push_back(new object3D(0.2,0.2,0.9));
-    updateGL();
-    //glPopMatrix();
-}
-
-
-void Scene3D::drawCube(float x,float y,float h)
-{
-
-
-    float sizex=0.2;
-    float sizey=0.2;
-
-    glBegin(GL_LINES);
-    glColor3f(0.5, 0.1, 0.9);
-
-    glVertex3f(x-sizex, y+sizey, h);
-    glVertex3f(x-sizex, y-sizey, h);
-    glVertex3f(x+sizex, y-sizey, h);
-    glVertex3f(x+sizex, y+sizey, h);
-
-    glVertex3f(x+sizex, y+sizey, h);
-    glVertex3f(x+sizex, y-sizey, h);
-    glVertex3f(x+sizex, y-sizey, 0);
-    glVertex3f(x+sizex, y+sizey, 0);
-
-    glVertex3f(x-sizex, y-sizey, h);
-    glVertex3f(x-sizex, y-sizey, 0);
-    glVertex3f(x+sizex, y-sizey, 0);
-    glVertex3f(x+sizex, y-sizey, h);
-
-    glVertex3f(x-sizex, y-sizey, h);
-    glVertex3f(x-sizex, y+sizey, h);
-    glVertex3f(x-sizex, y+sizey, 0);
-    glVertex3f(x-sizex, y-sizey, 0);
-
-    glVertex3f(x-sizex, y+sizey, h);
-    glVertex3f(x+sizex, y+sizey, h);
-    glVertex3f(x+sizex, y+sizey, 0);
-    glVertex3f(x-sizex, y+sizey, 0);
-
-
-
-
-
-
-
-
-
-    glEnd();
-}
-
