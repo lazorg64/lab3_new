@@ -1,8 +1,0 @@
-#ifndef SCENE_H
-#define SCENE_H
-
-#include <GL/glu.h>
-
-
-
-#endif // SCENE_H
